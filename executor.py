@@ -71,6 +71,12 @@ class Executor:
     def get_trade_history(self):
         return pd.DataFrame(self.trades)
 
+    def save_trade_history_to_csv(self, filepath='trade_log.csv'):
+        """Saves the trade history to a CSV file."""
+        df = self.get_trade_history()
+        df.to_csv(filepath, index=False)
+        print(f"Trade history saved to {filepath}")
+
 if __name__ == '__main__':
     # Example Usage
     executor = Executor()
@@ -88,3 +94,5 @@ if __name__ == '__main__':
 
     print("\nFinal Portfolio Status:")
     print(executor.get_portfolio_status())
+
+    executor.save_trade_history_to_csv()

@@ -92,6 +92,9 @@ class Backtester:
         print("\nFinal Portfolio Status:")
         print(executor.get_portfolio_status())
 
+        # Save the trade history to a CSV file
+        executor.save_trade_history_to_csv('trade_log.csv')
+
 if __name__ == '__main__':
     # Example usage for today's data
     today = datetime.now()
