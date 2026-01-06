@@ -66,7 +66,7 @@ class Backtester:
             return
 
         signal_generator = SignalGenerator(previous_day_data)
-        executor = Executor()
+        executor = Executor(symbol=self.symbol)
 
         for index, row in intraday_data.iterrows():
             candle = {

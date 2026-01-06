@@ -1,7 +1,8 @@
 import pandas as pd
 
 class Executor:
-    def __init__(self, initial_capital=100000):
+    def __init__(self, symbol, initial_capital=100000):
+        self.symbol = symbol
         self.capital = initial_capital
         self.position = None  # None, 'LONG', or 'SHORT'
         self.entry_price = 0
@@ -17,22 +18,22 @@ class Executor:
             self.position = 'LONG'
             self.entry_price = current_price
             self.stop_loss = stop_loss
-            print(f"Executed BUY at {current_price}, Stop Loss: {stop_loss}")
+            print(f"Executed BUY for {self.symbol} at {current_price}, Stop Loss: {stop_loss}")
             self._log_trade('BUY', current_price)
 
         elif signal == 'SELL' and not self.position:
             self.position = 'SHORT'
             self.entry_price = current_price
             self.stop_loss = stop_loss
-            print(f"Executed SELL at {current_price}, Stop Loss: {stop_loss}")
+            print(f"Executed SELL for {self.symbol} at {current_price}, Stop Loss: {stop_loss}")
             self._log_trade('SELL', current_price)
 
     def check_stop_loss(self, current_price):
         if self.position == 'LONG' and current_price <= self.stop_loss:
-            print(f"Stop loss triggered for LONG position at {current_price}")
+            print(f"Stop loss triggered for LONG position on {self.symbol} at {current_price}")
             self._close_position(current_price)
         elif self.position == 'SHORT' and current_price >= self.stop_loss:
-            print(f"Stop loss triggered for SHORT position at {current_price}")
+            print(f"Stop loss triggered for SHORT position on {self.symbol} at {current_price}")
             self._close_position(current_price)
 
     def _close_position(self, exit_price):
@@ -45,7 +46,7 @@ class Executor:
 
         self.capital += pnl
         self._log_trade('CLOSE', exit_price, pnl)
-        print(f"Closed {self.position} position at {exit_price}. PnL: {pnl:.2f}. Capital: {self.capital:.2f}")
+        print(f"Closed {self.position} position for {self.symbol} at {exit_price}. PnL: {pnl:.2f}. Capital: {self.capital:.2f}")
 
         self.position = None
         self.entry_price = 0
@@ -53,6 +54,7 @@ class Executor:
 
     def _log_trade(self, trade_type, price, pnl=0):
         self.trades.append({
+            'symbol': self.symbol,
             'type': trade_type,
             'price': price,
             'pnl': pnl,
@@ -79,7 +81,7 @@ class Executor:
 
 if __name__ == '__main__':
     # Example Usage
-    executor = Executor()
+    executor = Executor(symbol='TEST')
 
     # Simulate a successful long trade
     executor.execute_trade('BUY', 100, 95)
