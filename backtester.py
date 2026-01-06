@@ -5,10 +5,11 @@ from executor import Executor
 from datetime import datetime, timedelta
 
 class Backtester:
-    def __init__(self, symbol, start_date, end_date):
+    def __init__(self, symbol, start_date, end_date, output_filename='trade_log.csv'):
         self.symbol = symbol
         self.start_date = start_date
         self.end_date = end_date
+        self.output_filename = output_filename
 
     def get_last_trading_day(self, date):
         """
@@ -29,7 +30,7 @@ class Backtester:
         previous_day_data = self.get_last_trading_day(self.start_date)
 
         if previous_day_data is None or previous_day_data.empty:
-            print("Could not fetch previous day's data.")
+            print(f"Could not fetch previous day's data for {self.symbol}.")
             return
 
         try:
@@ -50,7 +51,7 @@ class Backtester:
                 interval="1m"
             )
             if intraday_data.empty:
-                print("No intraday data for the selected date. It might be a weekend or holiday.")
+                print(f"No intraday data for {self.symbol} on the selected date. It might be a weekend or holiday.")
                 return
 
             if isinstance(intraday_data.columns, pd.MultiIndex):
@@ -61,7 +62,7 @@ class Backtester:
             }, inplace=True)
 
         except Exception as e:
-            print(f"Error processing data: {e}")
+            print(f"Error processing data for {self.symbol}: {e}")
             return
 
         signal_generator = SignalGenerator(previous_day_data)
@@ -82,27 +83,28 @@ class Backtester:
             # Process candle for signals
             signal = signal_generator.process_candle(candle)
 
-            if signal['signal'] != 'HOLD':
+            if signal.get('signal') != 'HOLD':
                 executor.execute_trade(signal['signal'], signal['price'], signal['stop_loss'])
 
         # Final portfolio status
-        print("\nBacktest Complete.")
+        print(f"\nBacktest Complete for {self.symbol}.")
         print("Trade History:")
         print(executor.get_trade_history())
         print("\nFinal Portfolio Status:")
         print(executor.get_portfolio_status())
 
         # Save the trade history to a CSV file
-        executor.save_trade_history_to_csv('trade_log.csv')
+        executor.save_trade_history_to_csv(self.output_filename)
 
 if __name__ == '__main__':
-    # Example usage for today's data
+    # This part is for direct execution of the file, which we are not doing in the final implementation
     today = datetime.now()
     yesterday = today - timedelta(days=1)
 
     backtester = Backtester(
-        symbol='SBIN.NS', # Use the .NS suffix for NSE stocks
+        symbol='SBIN.NS',
         start_date=yesterday,
-        end_date=today
+        end_date=today,
+        output_filename='sbin_trade_log.csv'
     )
     backtester.run()
