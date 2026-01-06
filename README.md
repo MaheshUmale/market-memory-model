@@ -109,7 +109,7 @@ To distill the entire methodology into an actionable checklist, the process is a
 
 
 
-* **A Beginner's Guide to the Market Memory Model: Trading with Clarity**
+# ##A Beginner's Guide to the Market Memory Model: Trading with Clarity##
 
 Introduction: Trading What the Market Remembers
 
